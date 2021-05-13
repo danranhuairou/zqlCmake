@@ -1,35 +1,9 @@
-#include "TimeRecorder.h"
-#include <iostream>
-using namespace std;
+ï»¿#include "Console.h"
 
-string TimeToString(time_t target) {
-	tm* date = localtime(&target);
-	return to_string(date->tm_hour) + "Ê±" +
-		to_string(date->tm_min) + "·Ö" +
-		to_string(date->tm_sec) + "Ãë";
-}
+int main()
+{
+    RCD::TimeRecorder *timeRecorder = new Console;
+    timeRecorder->exec();
 
-int main() {
-	TimeRecorder timeRecorder;
-	time_t begin = time(NULL);
-	time_t end = begin + 60 * 60;
-
-	while (time(NULL) <= end) {
-		timeRecorder.Update();
-
-		system("cls");
-		for (auto i : timeRecorder.GetProList()) {
-			string name = i.name;
-			name = name.size() >= 20 ? name : name + string(20 - name.size(), ' ');
-
-			cout << name << timeRecorder.RunTime(i) << endl;
-		}
-		cout << "\n\ntotal:\t" << timeRecorder.TotalTime() << endl;
-
-		Sleep(1000);
-	}
-
-	cout << "\n¿ªÊ¼Ê±¼ä£º" << TimeToString(begin) << endl;
-	cout << "½áÊøÊ±¼ä£º" << TimeToString(time(NULL)) << endl;
-	system("pause");
+    return 0;
 }

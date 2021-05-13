@@ -1,42 +1,29 @@
-#include <list>
-#include <string>
-#include <Windows.h>
-#include <set>
-#include <ctime>
+﻿#ifndef _TIMERECORDER_H_
+#define _TIMERECORDER_H_
+#include "RCD.h"
+#include "SQL.h"
 
-struct _data {
-	size_t id;
-	std::string name;
-	time_t begin;
-	time_t front;
-	time_t total;
+namespace RCD
+{
+    class TimeRecorder
+    {
+    protected:
+        _listApp m_runPro;
+        SQL *m_sql;
 
-	_data() {
-		id = 0;
-		begin = 0;
-		front = 0;
-		total = 0;
-	}
-};
+        virtual void Update() = 0;
+        virtual inline time_t RunTime(const _appData &target) = 0;
 
-class TimeRecorder {
-private:
-	std::list<_data>m_runPro;
-	std::set<std::string>m_allPro;
-	DWORD m_frontPID, m_nowPID;
+        _time GetTime();
+        _string TotalTime();
+        void AddApplication(_string name, _string exeName);
+        void AddRecord(_size id, _time begin, _time end, _time total);
+        void Sort();
 
-	void GetAllProcess();
-
-	inline bool IsProcessRunning(const std::string& name);
-	inline bool GetExeName(const DWORD pid, std::string& ret);
-	inline DWORD ForeExePid();
-	inline time_t GetTime();
-	inline std::string TimeToString(time_t target);
-
-public:
-	TimeRecorder();
-	void Update();
-	std::list<_data>& GetProList();
-	std::string RunTime(const _data& target);
-	std::string TotalTime();
-};
+        static _string TimeToString(time_t target);
+        static bool cmp(const _appData& a, const _appData& b);
+    public:
+        virtual void exec() = 0;
+    };
+}
+#endif // !_TIMERECORDER_H_

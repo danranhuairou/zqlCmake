@@ -4,20 +4,18 @@
 #include <io.h>
 #include <set>
 
-inline bool FileIsLog(const char* name);		// 判断文件是否符合log文件的命名格式
-inline std::string TwoIntToStr(int target);		//两位数字转字符串，0补齐前面内容
-
 TinyLog::TinyLog(std::string direction, int maxCount)
 	:m_direction(direction), m_maxCount(maxCount)
 {
-	(void)mkdir(m_direction.c_str());
+	(void)_mkdir(m_direction.c_str());
 	ClearFile();
 
 	// fileName
 	time_t t = time(nullptr);
-	tm* date = localtime(&t);
-	m_fileName = m_direction + '/' + std::to_string(date->tm_year + 1900) + '_' +
-		TwoIntToStr(date->tm_mon + 1) + '_' + TwoIntToStr(date->tm_mday) + ".txt";
+	tm date;
+	localtime_s(&date, &t);
+	m_fileName = m_direction + '/' + std::to_string(date.tm_year + 1900) + '_' +
+		TwoIntToStr(date.tm_mon + 1) + '_' + TwoIntToStr(date.tm_mday) + ".txt";
 }
 
 void TinyLog::ClearFile() {
@@ -61,13 +59,14 @@ TinyLog::HeadLess& TinyLog::operator<<(const std::string& str) {
 	ifile.close();
 
 	time_t t = time(nullptr);
-	tm* date = localtime(&t);
+	tm date;
+	localtime_s(&date, &t);
 	std::string dateString = 
-		std::to_string(date->tm_year + 1900) + "年" +
-		TwoIntToStr(date->tm_mon + 1) + "月" +
-		TwoIntToStr(date->tm_mday) + "日" +
-		TwoIntToStr(date->tm_hour) + "分" +
-		TwoIntToStr(date->tm_sec) + "秒";
+		std::to_string(date.tm_year + 1900) + "年" +
+		TwoIntToStr(date.tm_mon + 1) + "月" +
+		TwoIntToStr(date.tm_mday) + "日" +
+		TwoIntToStr(date.tm_hour) + "分" +
+		TwoIntToStr(date.tm_sec) + "秒";
 	
 	std::string put = std::string(sign ? std::string("\n") : std::string("")) + "[ " + dateString + " ]\t" + str;
 	static HeadLess headLess({ this });
@@ -81,7 +80,7 @@ TinyLog::HeadLess& TinyLog::HeadLess::operator<<(const std::string& str) {
 	return *this;
 }
 
-bool FileIsLog(const char* name) {
+bool TinyLog::FileIsLog(const char* name) {
 	// name 规则
 	// 数字 * 4 _ 数字 * 2 _ 数字 * 2 .txt \0
 	// where is digit
@@ -96,14 +95,15 @@ bool FileIsLog(const char* name) {
 	return true;
 }
 
-std::string FileName(std::string dir) {
-	time_t t = time(nullptr);
-	tm* date = localtime(&t);
-	return dir + '/' + std::to_string(date->tm_year + 1900) + '_' + 
-		TwoIntToStr(date->tm_mon + 1) + '_' + TwoIntToStr(date->tm_mday) + ".txt";
-}
-
-std::string TwoIntToStr(int target) {
+std::string TinyLog::TwoIntToStr(int target) {
 	if (target < 10) return '0' + std::to_string(target);
 	else return std::to_string(target);
 }
+
+//std::string TinyLog::FileName(std::string dir) {
+//	time_t t = time(nullptr);
+//	tm date;
+//	localtime_s(&date, &t);
+//	return dir + '/' + std::to_string(date.tm_year + 1900) + '_' +
+//		TwoIntToStr(date.tm_mon + 1) + '_' + TwoIntToStr(date.tm_mday) + ".txt";
+//}

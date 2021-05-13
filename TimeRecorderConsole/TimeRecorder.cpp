@@ -1,132 +1,66 @@
-#include "TimeRecorder.h"
-#include <Psapi.h>
-#include <TlHelp32.h>
-using namespace std;
+ï»¿#include "TimeRecorder.h"
+#include <algorithm>
 
-TimeRecorder::TimeRecorder() {
-	m_frontPID = 0;
-	m_nowPID = 0;
+using namespace RCD;
+
+_time TimeRecorder::GetTime()
+{
+    return time(NULL);
 }
 
-list<_data>& TimeRecorder::GetProList() {
-	return m_runPro;
+_string TimeRecorder::TotalTime()
+{
+    _time sum = 0;
+    for (auto i : m_runPro)
+        if (i.running)
+            sum += RunTime(i);
+    return TimeToString(sum);
 }
 
-std::string TimeRecorder::RunTime(const _data& target) {
-	time_t runTime;
-	if (m_nowPID == target.id) {
-		runTime = time(NULL) - target.front + target.total;
-	}
-	else {
-		runTime = target.total;
-	}
-	return TimeToString(runTime);
+_string TimeRecorder::TimeToString(time_t target)
+{
+    int sec = target % 60;
+    target /= 60;
+    int min = target % 60;
+    target /= 60;
+    return std::to_wstring(target) + L"æ—¶" +
+           std::to_wstring(min) + L"åˆ†" +
+           std::to_wstring(sec) + L"ç§’";
 }
 
-void TimeRecorder::Update() {
-	m_nowPID = ForeExePid();
-	if (m_nowPID == m_frontPID) {
-		return;
-	}
-	else {
-		GetAllProcess();
-		// frontPID != nowPID µÄÇé¿öÏÂ£¬ÊÇ·ñÔÚ proList ÖÐÕÒµ½ nowPID
-		int sign = false;
-		for (auto i = m_runPro.begin(); i != m_runPro.end();)
-		{
-			if (i->id == m_frontPID) {
-				i->total += GetTime() - i->front;
-			}
-			else if (i->id == m_nowPID) {
-				i->front = GetTime();
-				sign = true;
-			}
-			else if (!IsProcessRunning(i->name)) {
-				i = m_runPro.erase(i);
-				continue;
-			}
-			i++;
-		}
-
-		if (!sign) {
-			_data t;
-			if (GetExeName(m_nowPID, t.name)) {
-				t.id = m_nowPID;
-				t.front = t.begin = GetTime();
-				m_runPro.push_back(t);
-			}
-		}
-		m_frontPID = m_nowPID;
-	}
+void TimeRecorder::AddApplication(_string name, _string exeName)
+{
+    m_sql->addApplication(name, exeName, 1);
 }
 
-std::string TimeRecorder::TotalTime() {
-	size_t sum = 0;
-	for (auto i : m_runPro)
-		sum += m_nowPID == i.id ? time(NULL) - i.front + i.total : i.total;
-	return TimeToString(sum);
+void TimeRecorder::AddRecord(_size id, _time begin, _time end, _time total)
+{
+    m_sql->addRecord(id, begin, end, total);
 }
 
-void TimeRecorder::GetAllProcess() {
-	m_allPro.clear();
-	HANDLE hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-	if (hProcessSnap == INVALID_HANDLE_VALUE) {
-		// error
-		return;
-	}
+bool TimeRecorder::cmp(const _appData& a, const _appData& b)
+{
+    // ç¬¬ä¸€ä¼˜å…ˆçº§ running
+    if (a.running != b.running)
+        return a.running == true;
+    // ç¬¬äºŒä¼˜å…ˆçº§ in sql
+    if (a.inSql != b.inSql)
+        return a.inSql == true;
+    // ç¬¬ä¸‰ä¼˜å…ˆçº§ totalTime
 
-	PROCESSENTRY32 pe32;
-	pe32.dwSize = sizeof(PROCESSENTRY32);
-
-	if (!Process32First(hProcessSnap, &pe32)) {
-		// error
-		CloseHandle(hProcessSnap);
-		return;
-	}
-
-	do
-	{
-		m_allPro.insert(pe32.szExeFile);
-	} while (Process32Next(hProcessSnap, &pe32));
-
-	CloseHandle(hProcessSnap);
-	return;
+    // 1. a b éƒ½ running == true
+    if (a.running) {
+        if (a.total > b.total)
+            return true;
+        else if (a.total < b.total)
+            return false;
+    }
+    // else
+    if (a.inSql) return a.sqlData.name >= b.sqlData.name;
+    else return a.sqlData.exeName >= b.sqlData.exeName;
 }
 
-bool TimeRecorder::IsProcessRunning(const std::string& name) {
-	return m_allPro.find(name) != m_allPro.end();
-}
-
-bool TimeRecorder::GetExeName(const DWORD pid, std::string& ret) {
-	HANDLE hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
-	//»ñÈ¡½ø³ÌÂ·¾¶
-	char* path = new char[MAX_PATH];
-	bool sign = K32GetModuleFileNameExA(hProcess, NULL, path, MAX_PATH);
-
-	if (sign) {
-		std::string exeName = path;
-		ret = exeName.substr(exeName.find_last_of('\\') + 1);
-	}
-	delete[] path;
-	return sign;
-}
-
-DWORD TimeRecorder::ForeExePid() {
-	DWORD pid;
-	GetWindowThreadProcessId(GetForegroundWindow(), &pid);
-	return pid;
-}
-
-time_t TimeRecorder::GetTime() {
-	return time(NULL);
-}
-
-string TimeRecorder::TimeToString(time_t target) {
-	int sec = target % 60;
-	target /= 60;
-	int min = target % 60;
-	target /= 60;
-	return to_string(target) + "Ê±" +
-		to_string(min) + "·Ö" +
-		to_string(sec) + "Ãë";
+void TimeRecorder::Sort()
+{
+    sort(m_runPro.begin(), m_runPro.end(), cmp);
 }

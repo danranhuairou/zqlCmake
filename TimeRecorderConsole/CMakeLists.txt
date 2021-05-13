@@ -3,9 +3,12 @@
 #
 cmake_minimum_required (VERSION 3.8)
 
+add_definitions(-DUNICODE -D_UNICODE)
+
 # 将源代码添加到此项目的可执行文件。
 project (TimeRecorderConsole)
-add_executable (TimeRecorder "main.cpp" "TimeRecorder.cpp" "TimeRecorder.h")
+add_executable (TimeRecorder "main.cpp" "TimeRecorder.cpp"
+"Console.cpp" "SQLite.cpp"
+"sqlite3.c" "tinyLog.cpp")
 
-add_subdirectory (myTest)
 # TODO: 如有需要，请添加测试并安装目标。
