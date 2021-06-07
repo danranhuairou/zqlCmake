@@ -15,21 +15,21 @@ inline string RandomName();
 int main()
 {
 	TinyLog log(DIRECTION);
-	log << "123123123\n" << "asd" << "°¢ËÉ´ó\n";
+	log << "123123123\n" << "asd" << "é˜¿æ¾å¤§\n";
 }
 
-// Éú³É n ´ÎËæ»úÎÄ¼þ£¬Êµ¼Ê²¢²»ÄÜÉú³É100¸öÎÄ¼þ£¬²âÊÔÈÕÖ¾ÀàµÄÅÅÐòÉ¾³ý¹¦ÄÜ
+// ç”Ÿæˆ n æ¬¡éšæœºæ–‡ä»¶ï¼Œå®žé™…å¹¶ä¸èƒ½ç”Ÿæˆ100ä¸ªæ–‡ä»¶ï¼Œæµ‹è¯•æ—¥å¿—ç±»çš„æŽ’åºåˆ é™¤åŠŸèƒ½
 void TestMain() {
 	const int n = 100;
 	vector<string>fileName;
 	for (int i = 0; i < n; i++) {
 		string str = DIRECTION "/" + RandomName();
 		fileName.push_back(str);
-		// ÐÂ½¨ÎÄ¼þ
+		// æ–°å»ºæ–‡ä»¶
 		ofstream file(str);
 		file.close();
 	}
-	//cout << "ÒÑ³É¹¦Éú³É " << n << " ´ÎËæ»úÎÄ¼þ\n";
+	//cout << "å·²æˆåŠŸç”Ÿæˆ " << n << " æ¬¡éšæœºæ–‡ä»¶\n";
 	//sort(fileName.begin(), fileName.end());
 	//Log log(DIRECTION);
 }
@@ -39,7 +39,7 @@ inline std::string TwoIntToStr(int target) {
 	else return std::to_string(target);
 }
 
-// Éú³É2021ÄêµÄÊ®¶þ¸öÔÂ£¬Ã¿¸öÔÂÈýÊ®Ò»Ìì£¬µÄËæ»úÎÄ¼þÃû
+// ç”Ÿæˆ2021å¹´çš„åäºŒä¸ªæœˆï¼Œæ¯ä¸ªæœˆä¸‰åä¸€å¤©ï¼Œçš„éšæœºæ–‡ä»¶å
 inline string RandomName() {
 	return "2021_" +
 		TwoIntToStr(rand() % 12 + 1) + "_"

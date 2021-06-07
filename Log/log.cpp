@@ -1,5 +1,6 @@
 ﻿#include "log.h"
 #include <algorithm>
+#include <direct.h>
 #include <fstream>
 #include <io.h>
 #include <vector>
@@ -14,8 +15,13 @@ void zql::LogStream::Write(const std::string& ss) {
 
 zql::LogStream& zql::LogStream::operator<<(const std::string& target) {
     Write(target);
-    if (m_subordinate != nullptr)
-        m_subordinate->Head() << target;
+    // 遍历儿子
+    auto ptr = m_subordinate;
+    while (ptr != nullptr) {
+        if (m_subordinate != nullptr)
+            m_subordinate->Head(this->m_extraHead) << target;
+        ptr = ptr->m_subordinate;
+    }
     return *this;
 }
 
@@ -51,7 +57,7 @@ zql::LogStream& zql::LogStream::Head(std::string extraHead) {
     // add m_extraHead
     if (extraHead.size() == 0)
         extraHead = m_extraHead;
-    sprintf_s(buffer, 30, "[%-8s] ", m_extraHead.c_str());
+    sprintf_s(buffer, 30, "[%-8s] ", extraHead.c_str());
     ret += buffer;
 
     delete[] buffer;
@@ -80,6 +86,7 @@ std::string zql::LogStream::GetFileName() {
 // class log
 zql::Log::Log(std::string path) {
     m_path = path;
+    _mkdir(m_path.c_str());
 
     // m_s_info
     m_s_info.SetExtraHead("info");
@@ -122,9 +129,8 @@ void zql::Log::ClearFiles() {
 
     sort(allFiles.begin(), allFiles.end(), fileCMP);
     // 删除小的文件夹，使文件夹总数为 m_maxCount
-    for (int i = 0; i < allFiles.size() - m_maxCount; i++) {
+    for (int i = 0; i < (int)allFiles.size() - (int)m_maxCount; i++)
         remove((m_path + '/' + allFiles[i].fileName).c_str());
-    }
 }
 
 bool zql::Log::fileCMP(const FileInfo& a, const FileInfo& b) {

@@ -1,4 +1,4 @@
-#include "tinyLog.h"
+ï»¿#include "tinyLog.h"
 #include <ctime>
 #include <direct.h>
 #include <io.h>
@@ -19,23 +19,23 @@ TinyLog::TinyLog(std::string direction, int maxCount)
 }
 
 void TinyLog::ClearFile() {
-	// °ÑËùÓÐÎÄ¼þ¼ÓÈë fileSet
+	// æŠŠæ‰€æœ‰æ–‡ä»¶åŠ å…¥ fileSet
 	std::set<std::string> fileSet;
 
-    struct _finddata_t c_file;
-    intptr_t hFile;
-    // Find first .txt file in log
-    if ((hFile = _findfirst((m_direction + "/*.txt").c_str(), &c_file)) != -1L)
-    {
-        do {
+	struct _finddata_t c_file;
+	intptr_t hFile;
+	// Find first .txt file in log
+	if ((hFile = _findfirst((m_direction + "/*.txt").c_str(), &c_file)) != -1L)
+	{
+		do {
 			if (FileIsLog(c_file.name))
 				fileSet.insert(c_file.name);
 		} while (_findnext(hFile, &c_file) == 0);
-        _findclose(hFile);
-    }
+		_findclose(hFile);
+	}
 
-	// É¾³ý fileSet ÖÐ¶àÓàµÄÈÕÖ¾ÎÄ¼þ
-	// ÒòÎªsetÊÇÉýÐòÅÅÁÐ£¬¹ÊµÚm_maxCount¸öºóÃæ¼´ÎªÒªÉ¾³ýµÄ
+	// åˆ é™¤ fileSet ä¸­å¤šä½™çš„æ—¥å¿—æ–‡ä»¶
+	// å› ä¸ºsetæ˜¯å‡åºæŽ’åˆ—ï¼Œæ•…ç¬¬m_maxCountä¸ªåŽé¢å³ä¸ºè¦åˆ é™¤çš„
 	if (fileSet.size() > m_maxCount) {
 		auto it = fileSet.begin();
 		for (int i = 0; it != fileSet.end() && i < m_maxCount; i++)
@@ -48,12 +48,12 @@ void TinyLog::ClearFile() {
 TinyLog::HeadLess& TinyLog::operator<<(const std::string& str) {
 	bool sign = false;
 
-	//ÅÐ¶ÏÎÄ¼þ×îºóÒ»¸ö×Ö·ûÊÇ·ñÊÇ\n ²»ÊÇÔòÉèÖÃsign = true ÒÔÌí¼Ó\n
+	//åˆ¤æ–­æ–‡ä»¶æœ€åŽä¸€ä¸ªå­—ç¬¦æ˜¯å¦æ˜¯\n ä¸æ˜¯åˆ™è®¾ç½®sign = true ä»¥æ·»åŠ \n
 	std::ifstream ifile(m_fileName.c_str());
 	ifile.seekg(-1, std::ios::end);
 	char c = -1;
 	ifile >> c;
-	// c == -1±íÊ¾ÊÇÎÄ¼þÎª¿Õ
+	// c == -1è¡¨ç¤ºæ˜¯æ–‡ä»¶ä¸ºç©º
 	if (c != -1 && c != '\n')
 		sign = true;
 	ifile.close();
@@ -61,13 +61,13 @@ TinyLog::HeadLess& TinyLog::operator<<(const std::string& str) {
 	time_t t = time(nullptr);
 	tm date;
 	localtime_s(&date, &t);
-	std::string dateString = 
-		std::to_string(date.tm_year + 1900) + "Äê" +
-		TwoIntToStr(date.tm_mon + 1) + "ÔÂ" +
-		TwoIntToStr(date.tm_mday) + "ÈÕ" +
-		TwoIntToStr(date.tm_hour) + "·Ö" +
-		TwoIntToStr(date.tm_sec) + "Ãë";
-	
+	std::string dateString =
+		std::to_string(date.tm_year + 1900) + "å¹´" +
+		TwoIntToStr(date.tm_mon + 1) + "æœˆ" +
+		TwoIntToStr(date.tm_mday) + "æ—¥" +
+		TwoIntToStr(date.tm_hour) + "åˆ†" +
+		TwoIntToStr(date.tm_sec) + "ç§’";
+
 	std::string put = std::string(sign ? std::string("\n") : std::string("")) + "[ " + dateString + " ]\t" + str;
 	static HeadLess headLess({ this });
 	return headLess << put;
@@ -81,8 +81,8 @@ TinyLog::HeadLess& TinyLog::HeadLess::operator<<(const std::string& str) {
 }
 
 bool TinyLog::FileIsLog(const char* name) {
-	// name ¹æÔò
-	// Êý×Ö * 4 _ Êý×Ö * 2 _ Êý×Ö * 2 .txt \0
+	// name è§„åˆ™
+	// æ•°å­— * 4 _ æ•°å­— * 2 _ æ•°å­— * 2 .txt \0
 	// where is digit
 	int a[] = { 0,1,2,3,5,6,8,9 };
 	for (int i = 0; i < 8; i++)

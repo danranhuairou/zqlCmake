@@ -16,14 +16,14 @@ public:
 	HeadLess& operator<<(const std::string&);
 
 private:
-	int m_maxCount;				// log ÎÄ¼þ×î¶àµÄÊýÁ¿
-	std::string m_direction;	// ËùÓÐ log ÎÄ¼þµÄ´æ´¢Î»ÖÃ 
-	std::string m_fileName;		// log ÎÄ¼þµÄÍêÕûÂ·¾¶Ãû
+	int m_maxCount;				// log æ–‡ä»¶æœ€å¤šçš„æ•°é‡
+	std::string m_direction;	// æ‰€æœ‰ log æ–‡ä»¶çš„å­˜å‚¨ä½ç½® 
+	std::string m_fileName;		// log æ–‡ä»¶çš„å®Œæ•´è·¯å¾„å
 
-	void ClearFile();			// É¾³ý¶àÓÚ m_maxCount µÄlogÎÄ¼þ
+	void ClearFile();			// åˆ é™¤å¤šäºŽ m_maxCount çš„logæ–‡ä»¶
 
-	inline bool FileIsLog(const char* name);		// ÅÐ¶ÏÎÄ¼þÊÇ·ñ·ûºÏlogÎÄ¼þµÄÃüÃû¸ñÊ½
-	inline std::string TwoIntToStr(int target);		//Á½Î»Êý×Ö×ª×Ö·û´®£¬0²¹ÆëÇ°ÃæÄÚÈÝ
+	inline bool FileIsLog(const char* name);		// åˆ¤æ–­æ–‡ä»¶æ˜¯å¦ç¬¦åˆlogæ–‡ä»¶çš„å‘½åæ ¼å¼
+	inline std::string TwoIntToStr(int target);		//ä¸¤ä½æ•°å­—è½¬å­—ç¬¦ä¸²ï¼Œ0è¡¥é½å‰é¢å†…å®¹
 	//std::string FileName(std::string dir);
 };
 #endif // !TINYLOG_H

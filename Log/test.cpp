@@ -40,8 +40,11 @@ void Test_FileNameParse() {
 }
 
 int main() {
-    Test_FileNameParse();
-    // Log log("C:/Home/GitProject/zqlCmake/Log/testlog");
-    // log(zql::Log::LOG_INFO) << "this is an info.";
-    // log(zql::Log::LOG_ERROR) << "this is an error.";
+    // Test_FileNameParse();
+    Log log("C:/Home/GitProject/zqlCmake/Log/testlog");
+    log(zql::Log::LOG_INFO) << "this is an info.";
+    log(zql::Log::LOG_ERROR) << "this is an error."
+                             << "this is second error.";
+    log(zql::Log::LOG_ERROR) << "this is an error."
+                             << "this is second error.";
 }
