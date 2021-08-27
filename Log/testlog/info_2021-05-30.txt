@@ -1,0 +1,11 @@
+[2021-05-30 20:14:19] [info    ] this is an info.
+[2021-05-30 20:14:19] [info    ] this is an error.
+[2021-05-30 20:14:19] [info    ] this is second error.
+[2021-05-30 20:15:23] [info    ] this is an info.
+[2021-05-30 20:15:23] [error   ] this is an error.
+[2021-05-30 20:15:23] [error   ] this is second error.
+[2021-05-30 20:15:48] [info    ] this is an info.
+[2021-05-30 20:15:48] [error   ] this is an error.
+[2021-05-30 20:15:48] [error   ] this is second error.
+[2021-05-30 20:15:48] [error   ] this is an error.
+[2021-05-30 20:15:48] [error   ] this is second error.
